@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -13,8 +10,40 @@ public class Test {
     static boolean check(IntPred predicate){
         return true;
     }
-
+    public static void getStatistics(List<Music> music){
+        IntSummaryStatistics intSummaryStatistics = music.stream().mapToInt(x -> x.getCount())
+                .summaryStatistics();
+        System.out.println(intSummaryStatistics.getMax());
+        System.out.println(intSummaryStatistics.getMin());
+        System.out.println(intSummaryStatistics.getAverage());
+        System.out.println(intSummaryStatistics.getSum());
+    }
+    /**
+     * Пример использования flatMap
+     * @param list
+     * @param artist
+     * @return
+     */
+    public static List<String> getNameAndCountry(List<Music> list,String artist){
+        /**
+         * по сути,ты просто последоватльено загрузил поля в один лист
+         */
+        return list.stream()
+                    .filter(music -> music.getArtist().equals("1"))
+                    .flatMap(music->Stream.of(music.getName(),music.getCountry()))
+                    .collect(Collectors.toList());
+    }
     public static void main(String[] args) {
+        long hello = new String("hello").chars().filter(x -> x >= 97 && x <= 122).count();/**
+         Можно было так,а можно было ссылкой на методы*/
+        System.out.println(new String("Hello") .chars()
+                                    .filter(Character::isLowerCase)
+                                    .count());
+        System.out.println(hello);
+        new Thread(()->{
+            System.out.println("Hello world");
+            System.out.println("Another String");
+        }).start();
         Runnable noArguments = () -> {
             System.out.println("Hello world");
             System.out.println("Another String");
@@ -101,6 +130,38 @@ public class Test {
          */
         List<User> collect1 = users.stream().sorted().collect(Collectors.toList());
         System.out.println(collect1);
-
+        System.out.println("_______________________________________");
+        /**
+         * Даже если это Integer или другие классы-оболочки,такие операции сложения будут допустимы
+         */
+        Task_Add task_add = (value)->value.reduce(0,(acc,elem)->acc+elem);
+        List<Integer> list = new ArrayList<>();
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        int i = task_add.addUp(list.stream());
+        System.out.println(i);
+        System.out.println("______________________________________________________");
+        List<Music> list1 = new ArrayList<>();
+        list1.add(new Music("1","1","1",3));
+        list1.add(new Music("1","Test","Test",4));
+        list1.add(new Music("2","2","2",2));
+        list1.add(new Music("3","3","3",3));
+        list1.add(new Music("4","4","4",4));
+        list1.add(new Music("0","0","0",0));
+        List<Music> collect2 = list1.stream().filter(music -> music.getCount() >= 3).collect(Collectors.toList());
+        System.out.println(collect2);
+        System.out.println("______________________________________________________");
+        String[][] arr = {{"Artem"," loves", " Java"}};
+        /**
+         * Flat map собирает все данные в один поток.Удобно для обработки двумерных массивов
+         */
+        Stream<String> objectStream = Arrays.stream(arr).flatMap(x -> Arrays.stream(x));
+        objectStream.forEach(System.out::println);
+        List<String> nameAndCountry = getNameAndCountry(list1, "1");
+        System.out.println("______________________________________________________");
+        System.out.println(nameAndCountry);
+        System.out.println("______________________________________________________");
+        getStatistics(list1);
     }
 }
